@@ -14,6 +14,9 @@ const TOKEN_PATH = path.join(process.cwd(), 'token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 const CALENDAR_ID = '426op8ij7751vsbaaqic8nb7h0@group.calendar.google.com'; //primary
 
+// Get API key from environment variable or set it directly
+const API_KEY = process.env.GOOGLE_API_KEY || 'YOUR_API_KEY_HERE';
+
 /**
  * Reads previously authorized credentials from the save file.
  */
@@ -61,14 +64,17 @@ async function authorize() {
   return client;
 }
 
-// ... (reuse the same authorization code from the previous answer)
-
 /**
  * Lists all calendars the user has access to.
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function listCalendars(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({
+    version: 'v3', 
+    auth,
+    key: API_KEY // Add API key here
+  });
+  
   const res = await calendar.calendarList.list();
 
   const calendars = res.data.items;
@@ -89,10 +95,13 @@ async function listCalendars(auth) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({
+    version: 'v3', 
+    auth,
+    key: API_KEY // Add API key here
+  });
+  
   const res = await calendar.events.list({
-    // Use 'primary' for your main calendar.
-    // To get events from another calendar, you need its ID (e.g., 'xyz@group.calendar.google.com')
     calendarId: CALENDAR_ID, 
     timeMin: (new Date()).toISOString(),
     maxResults: 2500,
